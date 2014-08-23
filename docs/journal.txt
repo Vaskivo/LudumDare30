@@ -1,0 +1,15 @@
+Saturday 11:00 AM
+
+Gonna start now. Yesterday I went for a couple of drinks with some friends. I left for home when the theme was announced, but I was a little tired and a little drunk so I went to bed to sleep and brainstorm. 
+
+Waking up, I had my mind set on the game. It's going to be a shmup. It's gonna have four levels, and you can go from one level to any of the others. They ways to travel between the levels are hidden, and when you travel from one level to another, some characteristics of the previous one are introduced to the next. The game ends when you travel all the level combinations.
+
+The levels will be:
+
+1 - moving enemies, few bullets (old school)
+2 - Asteroid level
+3 - slower enemies, lots of bullets (danmaku)
+4 - Boss level.
+
+
+Now I have to set up my development software and build the basic game structure.
