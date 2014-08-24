@@ -19,7 +19,8 @@ function Bullet.new(x, y, config, boundaries)
   local fixture = body:addCircle(0, 0, config.hitbox_radius)
   fixture:setSensor(true)
   
-  body:setLinearVelocity(0, config.speed)
+  body:setLinearVelocity(config.direction.x * config.speed, 
+                         config.direction.y * config.speed)
   
   -- putting everything in its place
   bullet.prop = prop

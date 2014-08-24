@@ -9,7 +9,7 @@ local BulletController = {}
 BulletController.__index = BulletController
 
 
-function BulletController.new(transform, layer, config, boundaries)
+function BulletController.new(parent_body, layer, config, boundaries)
   local controller = setmetatable({}, BulletController)
   
   local timer = MOAITimer.new()
@@ -17,7 +17,7 @@ function BulletController.new(transform, layer, config, boundaries)
   timer:setMode(MOAITimer.LOOP)
   timer:setListener(MOAITimer.EVENT_TIMER_LOOP, config.behaviour(controller))
   
-  controller.transform = transform
+  controller.parent_body = parent_body
   controller.layer = layer
   controller.bullet_set = {}
   controller.config = config
@@ -39,7 +39,7 @@ function BulletController.update(self, delta_time)
 end
 
 function BulletController.createBullet(self, x, y)
-  local my_x, my_y = self.transform:getLoc()
+  local my_x, my_y = self.parent_body:getPosition()
   local bullet = Bullet.new(my_x + x, my_y + y, self.config, self.boundaries)
   self.layer:insertProp(bullet.prop)
   self.bullet_set[bullet] = true
@@ -53,15 +53,24 @@ function BulletController.destroyBullet(self, bullet)
   end
 end
 
-function BulletController.startController(self)
+function BulletController.start(self)
   self.timer:start()
 end
 
-function BulletController.stopController(self)
+function BulletController.stop(self)
   self.timer:stop()
 end
 
-
+function BulletController.destroy(self)
+  self.timer:stop()
+  self.timer = nil
+  
+  self.parent_body = nil
+  self.layer = nil
+  self.bullet_set = nil
+  self.config = nil
+  self.boundaries = nil
+end
 
 
 return BulletController

@@ -1,17 +1,18 @@
 -------------------------------------------------------------------------------                    
 -- Ensure undefined global access is an error.                                                     
 -------------------------------------------------------------------------------                    
-
+---[[
 local global_meta = {}      
 setmetatable(_G, global_meta)
 
 function global_meta:__index(k)
     error("Undefined global variable '" .. k .. "'!")                                              
 end
-
+--]]
 
 lume = require 'utils/lume'
 inspect = require 'utils/inspect'
+
 
 -- Here we go!!
 
@@ -52,32 +53,28 @@ physicsWorld:start()
 
 --MOAIDebugLines.setStyle(MOAIDebugLines.PROP_MODEL_BOUNDS)
 
+
 -- do stuff
+
+require 'resourcemgr'
 
 PlayerShip = require 'entities/playership'
 Bullet = require 'entities/bullet'
 BulletController = require 'entities/bulletcontroller'
 BulletTypes = require 'entities/bullettypes'
 Enemy = require 'entities/enemy'
-
-
-player = PlayerShip.new()
-player:setBoundaries(-240, -400, 240, 400)
-
-layers[layer_Player]:insertProp(player.prop)
+EnemyTypes = require 'entities/enemytypes'
 
 bounds = { min_x = -250,
            min_y = -410,
            max_x = 250,
            max_y = 410
           }
-controller = BulletController.new (player.prop, 
-                                   layers[layer_PlayerBullets], 
-                                   BulletTypes.player, 
-                                   bounds)
-controller:startController()
 
-enemy = Enemy.new(-50, 300)
+player = PlayerShip.new(0, 0, bounds)
+layers[layer_Player]:insertProp(player.prop)
+
+enemy = Enemy.new(-50, 300, EnemyTypes.enemy1, bounds)
 layers[layer_Enemies]:insertProp(enemy.prop)
 
 
@@ -89,7 +86,8 @@ function main()
     -- update stuff
     player:update(delta_time)
     --bulletMgr:update(delta_time)
-    controller:update(delta_time)
+    --controller:update(delta_time)
+    enemy:update(delta_time)
     
     run_time = now
     
@@ -147,7 +145,7 @@ mouse_y = 0
 mouse_down = false
 
 function onPointerEvent ( x, y )
-	mouse_x, mouse_y = layer:wndToWorld(x, y)
+	mouse_x, mouse_y = layers[layer_Player]:wndToWorld(x, y)
   if mouse_down then
     player:setDestination(mouse_x, mouse_y)
     player:setDirection(mouse_x, mouse_y)

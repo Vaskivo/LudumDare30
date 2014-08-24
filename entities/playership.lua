@@ -8,6 +8,7 @@ PlayerShip.__index = PlayerShip  -- dont forget this.
 local TAG = 'PLAYER_SHIP'
 local speed = 300
 
+--[[
 local deck = MOAIScriptDeck.new()
 deck:setRect(-24, -32, 24, 32)
 deck:setDrawCallback(
@@ -16,9 +17,15 @@ deck:setDrawCallback(
     MOAIDraw.fillRect(-24, -32, 24, 32)
   end
 )
+]]
 
 
-function PlayerShip.new()
+local deck = MOAIGfxQuad2D.new()
+deck:setTexture( ResourceManager.getSprite( 'ship.png') )
+deck:setRect(-24, -32, 24, 32)
+
+
+function PlayerShip.new(x, y, boundaries)
   local ship = setmetatable({}, PlayerShip)
   
   -- inits
@@ -26,9 +33,27 @@ function PlayerShip.new()
   prop:setDeck(deck)
   prop:setLoc(0, 0)
   
+  local body = physicsWorld:addBody(MOAIBox2DBody.KINEMATIC)
+  body:setTransform(x, y)
+  
+  prop:setAttrLink(MOAIProp2D.INHERIT_LOC, body, MOAIProp2D.TRANSFORM_TRAIT)
+  
+  local fixture = body:addRect(-16, -16, 16, 16)
+  fixture:setSensor(true)
+  
+  local controller = BulletController.new (body, 
+                                           layers[layer_PlayerBullets], 
+                                           BulletTypes.player, 
+                                           boundaries)
+  controller:start()
   
   -- putting everything in its place
   ship.prop = prop
+  ship.body = body
+  ship.fixture = fixture
+  fixture.entity = ship
+  ship.controller = controller
+  
   ship.TAG = TAG
   
   ship.direction = { x = 0, y = 0 }
@@ -40,7 +65,7 @@ end
 
 
 function PlayerShip.update(self, delta_time)
-  local x, y = self.prop:getLoc()
+  local x, y = self.body:getPosition()
   local mov_x = (self.direction.x * delta_time)
   local mov_y = (self.direction.y * delta_time)
   local new_x = x + mov_x
@@ -62,12 +87,14 @@ function PlayerShip.update(self, delta_time)
     end
   end
   
-  self.prop:setLoc(new_x, new_y)
+  self.body:setTransform(new_x, new_y)
+  
+  self.controller:update(delta_time)
 end
 
 -- to be used with touch/mouse input
 function PlayerShip.setDirection(self, x, y)
-  local pos_x, pos_y = self.prop:getLoc()
+  local pos_x, pos_y = self.body:getPosition()
   local v_x = x - pos_x
   local v_y = y - pos_y
   
