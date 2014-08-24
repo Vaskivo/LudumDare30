@@ -24,13 +24,33 @@ viewport = MOAIViewport.new()
 viewport:setSize(SCREEN_WIDTH, SCREEN_HEIGHT)
 viewport:setScale(SCREEN_WIDTH, SCREEN_HEIGHT)
 
-layer = MOAILayer2D.new()
-layer:setViewport(viewport)
 
-MOAIRenderMgr.setRenderTable( { layer } )
+-- layers
+layer_Background = 1
+layer_Enemies = 2
+layer_Player = 3
+layer_PlayerBullets = 4
+layer_EnemyBullets = 5
+layer_GUI = 6
+
+layers = {}
+for i = 1, 6 do
+  local layer = MOAILayer2D.new()
+  layer:setViewport(viewport)
+  layers[i] = layer
+end
 
 
+--layer = MOAILayer2D.new()
+--layer:setViewport(viewport)
 
+MOAIRenderMgr.setRenderTable( layers )
+
+physicsWorld = MOAIBox2DWorld.new()
+physicsWorld:setUnitsToMeters(0.1)
+physicsWorld:start()
+
+--MOAIDebugLines.setStyle(MOAIDebugLines.PROP_MODEL_BOUNDS)
 
 -- do stuff
 
@@ -44,13 +64,21 @@ Enemy = require 'entities/enemy'
 player = PlayerShip.new()
 player:setBoundaries(-240, -400, 240, 400)
 
-layer:insertProp(player.prop)
+layers[layer_Player]:insertProp(player.prop)
 
-controller = BulletController.new (player.prop, layer, BulletTypes.player)
+bounds = { min_x = -250,
+           min_y = -410,
+           max_x = 250,
+           max_y = 410
+          }
+controller = BulletController.new (player.prop, 
+                                   layers[layer_PlayerBullets], 
+                                   BulletTypes.player, 
+                                   bounds)
 controller:startController()
 
 enemy = Enemy.new(-50, 300)
-layer:insertProp(enemy.prop)
+layers[layer_Enemies]:insertProp(enemy.prop)
 
 
 function main()

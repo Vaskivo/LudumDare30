@@ -11,11 +11,12 @@ deck:setDrawCallback(
   end
 )
 
-BulletTypes.player = { TAG = 'PLAYER_BULLET'
+BulletTypes.player = { TAG = 'PLAYER_BULLET',
                        deck = deck,
                        direction = { x = 0, y = 500},
-                       speed = 1000,
+                       speed = 500,
                        rate_of_fire = 1/20,
+                       hitbox_radius = 5
                      }
 BulletTypes.player.behaviour = function (controller)
     local state = 0

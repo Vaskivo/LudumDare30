@@ -70,6 +70,9 @@ function lume.pingpong(x)
 end
 
 -- my additions to lume
+function lume.inside(x, min, max)
+  return x >= min and x <= max
+end
 
 function lume.norm(x, y)
   return math.sqrt( (x * x) + (y * y))
