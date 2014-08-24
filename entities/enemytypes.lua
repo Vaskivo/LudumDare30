@@ -14,53 +14,134 @@ deck:setDrawCallback(
 )
 ]]
 
-local enemy1_deck = MOAIGfxQuad2D.new()
-enemy1_deck:setTexture( ResourceManager.getSprite( 'enemy1.png') )
-enemy1_deck:setRect(-32, -32, 32, 32)
+local enemy_small_deck = MOAIGfxQuad2D.new()
+enemy_small_deck:setTexture( ResourceManager.getSprite( 'enemy_small.png') )
+enemy_small_deck:setRect(-16, -16, 16, 16)
 
 
-EnemyTypes.enemy1 = { TAG = 'ENEMY',
-                      deck = enemy1_deck,
-                      life = 50,
-                      hitbox = { min_x = -32,
-                                 min_y = -32,
-                                 max_x = 32,
-                                 max_y = 32
-                               },
-                      bulletType = BulletTypes.enemy1,
-                    }
-EnemyTypes.enemy1.behaviour = function (enemy)
-    local state = 0
-    local f = function ()
-      enemy.body:setLinearVelocity(0, 0)
-      if state == 0 then
-        print(state)
-        enemy.body:setLinearVelocity(30, 0)
-        state = 1
-        enemy.timer:stop()
-        enemy.timer:setSpan(4)
-        enemy.timer:start()
-      elseif state == 1 then
-        print(state)
-        enemy.body:setLinearVelocity(0, -30)
-        state = 2
-        enemy.timer:stop()
-        enemy.timer:setSpan(4)
-        enemy.timer:start()
-      elseif state == 2 then 
-        print(state)
-        enemy.body:setLinearVelocity(-30, 0)
-        state = 3
-        enemy.timer:stop()
-        enemy.timer:setSpan(5)
-        enemy.timer:start()
-      else
-        print(state)
-        enemy.dead = true
-      end
-    end
-    return f
+EnemyTypes.enemy_small = { TAG = 'ENEMY',
+                           deck = enemy_small_deck,
+                           life = 25,
+                           hitbox = { min_x = -16,
+                                      min_y = -16,
+                                      max_x = 16,
+                                      max_y = 16
+                                    },
+                           bulletType = BulletTypes.enemy1,
+                         }
+EnemyTypes.enemy_small.behaviour = function(enemy)
+  local state = 0
+  local test = function()
+    return enemy and enemy.body
   end
-        
+  
+  local f = function()
+    local timer = MOAITimer.new()
+    
+    -- first action
+    if test then
+      enemy.body:setLinearVelocity(0, -20)
+      timer:setSpan(2)
+      timer:start()
+      MOAICoroutine.blockOnAction(timer)
+    end
+    
+    -- second action
+    if test then
+      enemy.body:setLinearVelocity(20, 0)
+      timer:setSpan(2)
+      timer:start()
+    end
+    
+    
+  end
+  return f
+end
+--[[
+EnemyTypes.enemy_small.behaviour = function(enemy)
+  local state = 0
+  local f = function()
+    if not enemy or not enemy.body then
+      return
+    end
+    if state == 0 then
+      enemy.body:setLinearVelocity(0, -100)
+      state = 1
+    else state = 1 then
+      if not enemy:insideBoundaries() then
+        enemy.dead = true
+        state = 2
+      end
+    else
+      enemy.dead = true
+    end
+  end
+  return f
+end
+--]]
+
+EnemyTypes.enemy_small_1 = { TAG = 'ENEMY',
+                             deck = enemy_small_deck,
+                             life = 25,
+                             hitbox = { min_x = -16,
+                                        min_y = -16,
+                                        max_x = 16,
+                                        max_y = 16
+                                      },
+                             bulletType = BulletTypes.enemy1,
+                           }
+EnemyTypes.enemy_small_1.behaviour = function (enemy)
+  local state = 0
+  local f = function ()
+    if not enemy or not enemy.body then
+      return
+    end
+    if state == 0 then
+      enemy.body:setLinearVelocity(200, -200)
+      state = 1
+    elseif state == 1 then
+      if not enemy:insideBoundaries() then
+        enemy.dead = true
+        state = 2
+      end
+    else
+      enemy.dead = true
+    end
+  end
+  return f
+end
+    
+    
+EnemyTypes.enemy_small_2 = { TAG = 'ENEMY',
+                             deck = enemy_small_deck,
+                             life = 50,
+                             hitbox = { min_x = -16,
+                                        min_y = -16,
+                                        max_x = 16,
+                                        max_y = 16
+                                      },
+                             bulletType = BulletTypes.enemy1,
+                           }
+EnemyTypes.enemy_small_2.behaviour = function (enemy)
+  local state = 0
+  local f = function ()
+    if not enemy or not enemy.body then
+      return
+    end
+    if state == 0 then
+      enemy.body:setLinearVelocity(-200, -200)
+      state = 1
+    elseif state == 1 then
+      if not enemy:insideBoundaries() then
+        enemy.dead = true
+        state = 2
+      end
+    else
+      enemy.dead = true
+    end
+  end
+  return f
+end
+    
 
 return EnemyTypes

@@ -65,6 +65,7 @@ end
 
 
 function PlayerShip.update(self, delta_time)
+  
   local x, y = self.body:getPosition()
   local mov_x = (self.direction.x * delta_time)
   local mov_y = (self.direction.y * delta_time)

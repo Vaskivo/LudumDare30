@@ -35,14 +35,17 @@ function Enemy.new(x, y, config, boundaries)
                                                  BulletTypes.enemy1, 
                                                  boundaries)
   bulletController:start()
+
   
-  --body:setLinearVelocity(10, 0)
-  
+  --[[
   local timer = MOAITimer.new()
   timer:setSpan(1)
   timer:setMode(MOAITimer.LOOP)
   timer:setListener(MOAITimer.EVENT_TIMER_LOOP, config.behaviour(enemy))
   timer:start()
+  --]]
+  local behaviour = MOAICoroutine.new()
+  
   
   -- putting everything in it's place
   enemy.prop = prop
@@ -51,7 +54,8 @@ function Enemy.new(x, y, config, boundaries)
   fixture.entity = enemy
   
   enemy.bulletController = bulletController
-  enemy.timer = timer
+  enemy.behaviour = behaviour
+  --enemy.timer = timer
   
   enemy.TAG = config.TAG
   enemy.life = config.life
@@ -62,6 +66,8 @@ function Enemy.new(x, y, config, boundaries)
   enemy.dead = false
   enemy.hitsLastFrame = 0
   
+  
+  behaviour:run(config.behaviour(enemy))
   return enemy
 end
 
@@ -95,6 +101,14 @@ function Enemy.destroy(self)
   layers[layer_Enemies]:removeProp(self.prop)
   self.prop = nil
   self.deck = nil
+end
+
+function Enemy.insideBoundaries(self)
+  local bounds = self.boundaries
+  local x, y = self.body:getPosition()
+  
+  return lume.inside(y, bounds.min_y, bounds.max_y) and 
+         lume.inside(x, bounds.min_x, bounds.max_x) 
 end
 
 function Enemy._collisionCallback( event, fixtureA, fixtureB, arbiter )
