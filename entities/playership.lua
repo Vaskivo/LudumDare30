@@ -9,7 +9,7 @@ local PlayerShip = {}
 PlayerShip.__index = PlayerShip  -- dont forget this.
 
 local TAG = 'PLAYER_SHIP'
-local speed = 300
+local speed = 500
 
 
 local deck = MOAIGfxQuad2D.new()
@@ -128,6 +128,17 @@ function PlayerShip.setBoundaries(self, min_x, min_y, max_x, max_y)
                       max_x = max_x,
                       max_y = max_y
                     }
+end
+
+function PlayerShip.destroy(self)
+  self.behaviour:stop()
+  
+  -- destroy physics
+  
+  self.controller:destroy()
+  layers[layer_Player]:removeProp(self.prop)
+  self.prop = nil
+  self.deck = nil
 end
 
 function PlayerShip.createBehaviour(self)

@@ -37,12 +37,13 @@ layer_GUIText = 7
 
 layers = {}
 function resetLayers()
+  layers = {}
   for i = 1, 7 do
     local layer = MOAILayer2D.new()
     layer:setViewport(viewport)
     layers[i] = layer
   end
-  
+  MOAIRenderMgr.setRenderTable(nil)
   MOAIRenderMgr.setRenderTable( layers )
   return layers
 end
@@ -59,5 +60,5 @@ SceneManager = require 'scenemgr'
 
 sceneManager = SceneManager.new()
 
-sceneManager:switchToScene('level1')
+sceneManager:switchToScene('title')
 sceneManager:start()

@@ -32,12 +32,16 @@ function BulletController.update(self, delta_time)
   end
 end
 
-function BulletController.createBullet(self, x, y)
+function BulletController.createBullet(self, x, y, dir_x, dir_y)
   if self.parent_body then
     local my_x, my_y = self.parent_body:getPosition()
     local bullet = Bullet.new(my_x + x, my_y + y, self.config, self.boundaries)
     self.layer:insertProp(bullet.prop)
     self.bullet_set[bullet] = true
+    
+    if dir_x and dir_y then
+      bullet:setDirection(dir_x, dir_y)
+    end
   end
 end
 

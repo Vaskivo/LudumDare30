@@ -19,9 +19,6 @@ function Bullet.new(x, y, config, boundaries)
   local fixture = body:addCircle(0, 0, config.hitbox_radius)
   fixture:setSensor(true)
   
-  body:setLinearVelocity(config.direction.x * config.speed, 
-                         config.direction.y * config.speed)
-  
   -- putting everything in its place
   bullet.prop = prop
   bullet.deck = config.deck
@@ -31,7 +28,9 @@ function Bullet.new(x, y, config, boundaries)
   
   bullet.TAG = config.TAG
   bullet.speed = config.speed
-  bullet.direction = config.direction
+  bullet.direction = {}
+  bullet:setDirection(config.direction.x, config.direction.y)
+  
   bullet.rate_of_fire = config.rate_of_fire
   bullet.hitbox_radius = config.hitbox_radius
   
@@ -62,6 +61,9 @@ function Bullet.setDirection(self, x, y)
   local new_x, new_y = lume.normalize(v_x, v_y)
   self.direction.x = self.speed * new_x
   self.direction.y = self.speed * new_y
+  self.body:setLinearVelocity(0, 0)
+  self.body:setLinearVelocity(self.direction.x * self.speed, 
+                              self.direction.y * self.speed)
 end
 
 function Bullet.resetDirection(self)

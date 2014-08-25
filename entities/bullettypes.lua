@@ -16,19 +16,14 @@ BulletTypes.player = { TAG = 'PLAYER_BULLET',
                        hitbox_radius = 4
                      }
 
-local deck1 = MOAIScriptDeck.new()
-deck1:setRect(-10, -10, 10, 10)
-deck1:setDrawCallback(
-  function ()
-    MOAIGfxDevice.setPenColor(1,1,0)
-    MOAIDraw.fillCircle(0, 0, 10)
-  end
-)
+local enemy_bullet_deck = MOAIGfxQuad2D.new()
+enemy_bullet_deck:setRect(-12, -12, 12, 12)
+enemy_bullet_deck:setTexture( ResourceManager.getSprite('enemy_bullet.png') )
 
 BulletTypes.enemy1 = { TAG = 'ENEMY_BULLET',
-                       deck = deck1,
+                       deck = enemy_bullet_deck,
                        direction = { x = 0, y = -1},
-                       speed = 200,
+                       speed = 20,
                        rate_of_fire = 2,
                        hitbox_radius = 5,
                      }
