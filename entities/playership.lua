@@ -1,4 +1,7 @@
 
+Bullet = require 'entities/bullet'
+BulletTypes = require 'entities/bullettypes'
+
 -- main player
 
 
@@ -7,17 +10,6 @@ PlayerShip.__index = PlayerShip  -- dont forget this.
 
 local TAG = 'PLAYER_SHIP'
 local speed = 300
-
---[[
-local deck = MOAIScriptDeck.new()
-deck:setRect(-24, -32, 24, 32)
-deck:setDrawCallback(
-  function ()
-    MOAIGfxDevice.setPenColor(1,0,0)
-    MOAIDraw.fillRect(-24, -32, 24, 32)
-  end
-)
-]]
 
 
 local deck = MOAIGfxQuad2D.new()
@@ -41,11 +33,15 @@ function PlayerShip.new(x, y, boundaries)
   local fixture = body:addRect(-16, -16, 16, 16)
   fixture:setSensor(true)
   
+  ---[[
   local controller = BulletController.new (body, 
                                            layers[layer_PlayerBullets], 
                                            BulletTypes.player, 
                                            boundaries)
-  controller:start()
+  --controller:start()
+  --]]
+  
+  local behaviour = MOAICoroutine.new()
   
   -- putting everything in its place
   ship.prop = prop
@@ -53,13 +49,16 @@ function PlayerShip.new(x, y, boundaries)
   ship.fixture = fixture
   fixture.entity = ship
   ship.controller = controller
+  ship.behaviour = behaviour
+  
   
   ship.TAG = TAG
   
   ship.direction = { x = 0, y = 0 }
-  ship.boundaries = nil   -- explicit for readability
+  ship.boundaries = boundaries
   ship.destination = nil
   
+  behaviour:run(ship:createBehaviour())
   return ship
 end
 
@@ -130,5 +129,31 @@ function PlayerShip.setBoundaries(self, min_x, min_y, max_x, max_y)
                       max_y = max_y
                     }
 end
+
+function PlayerShip.createBehaviour(self)
+  local state = 0
+  local span = BulletTypes.player.rate_of_fire
+  
+  local f = function()
+    local timer = MOAITimer.new()
+    
+    while true do
+      if state == 0 then 
+        self.controller:createBullet(0, 30)
+        state = 1
+      else
+        self.controller:createBullet(-10, 30)
+        self.controller:createBullet(10, 30)
+        state = 0
+      end
+
+      timer:setSpan(span)
+      timer:start()
+      MOAICoroutine.blockOnAction(timer)
+    end
+  end
+  return f
+end
+      
 
 return PlayerShip

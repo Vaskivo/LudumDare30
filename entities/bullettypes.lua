@@ -11,25 +11,10 @@ player_bullet_deck:setRect(-4, -16, 4, 16)
 BulletTypes.player = { TAG = 'PLAYER_BULLET',
                        deck = player_bullet_deck,
                        direction = { x = 0, y = 1},
-                       speed = 800,
-                       rate_of_fire = 1/30,
+                       speed = 1000,
+                       rate_of_fire = 1/60,
                        hitbox_radius = 4
                      }
-BulletTypes.player.behaviour = function (controller)
-    local state = 0
-    local f = function ()
-        if state == 0 then
-          controller:createBullet(0, 30)
-          state = 1
-        elseif state == 1 then
-          controller:createBullet(-10, 30)
-          controller:createBullet(10, 30)
-          state = 0
-        end
-      end
-    return f
-  end
-
 
 local deck1 = MOAIScriptDeck.new()
 deck1:setRect(-10, -10, 10, 10)
@@ -47,12 +32,7 @@ BulletTypes.enemy1 = { TAG = 'ENEMY_BULLET',
                        rate_of_fire = 2,
                        hitbox_radius = 5,
                      }
-BulletTypes.enemy1.behaviour = function (controller)
-    local f = function ()
-      controller:createBullet(0, -20)
-    end
-    return f
-  end
+
 
 
 

@@ -21,16 +21,32 @@ enemy_small_deck:setRect(-16, -16, 16, 16)
 
 EnemyTypes.enemy_small = { TAG = 'ENEMY',
                            deck = enemy_small_deck,
-                           life = 25,
+                           life = 5,
                            hitbox = { min_x = -16,
                                       min_y = -16,
                                       max_x = 16,
                                       max_y = 16
                                     },
                            bulletType = BulletTypes.enemy1,
+                           behaviour = {},
                          }
-EnemyTypes.enemy_small.behaviour = function(enemy)
-  local state = 0
+EnemyTypes.enemy_small.behaviour[1] = function(enemy)
+  local test = function()
+    return enemy and enemy.body
+  end
+  
+  local f = function()
+    local timer = MOAITimer.new()
+    -- first action
+    if test() then
+      enemy.body:setLinearVelocity(0, -250)
+    end
+  end
+  return f
+end
+
+
+EnemyTypes.enemy_small.behaviour[2] = function(enemy)
   local test = function()
     return enemy and enemy.body
   end
@@ -38,110 +54,20 @@ EnemyTypes.enemy_small.behaviour = function(enemy)
   local f = function()
     local timer = MOAITimer.new()
     
-    -- first action
-    if test then
-      enemy.body:setLinearVelocity(0, -20)
-      timer:setSpan(2)
-      timer:start()
-      MOAICoroutine.blockOnAction(timer)
+    if test() then
+      enemy.body:setLinearVelocity(250, -180)
+      
+      utils.threadSleep(2)
     end
     
-    -- second action
-    if test then
-      enemy.body:setLinearVelocity(20, 0)
-      timer:setSpan(2)
-      timer:start()
-    end
-    
-    
-  end
-  return f
-end
---[[
-EnemyTypes.enemy_small.behaviour = function(enemy)
-  local state = 0
-  local f = function()
-    if not enemy or not enemy.body then
-      return
-    end
-    if state == 0 then
-      enemy.body:setLinearVelocity(0, -100)
-      state = 1
-    else state = 1 then
-      if not enemy:insideBoundaries() then
-        enemy.dead = true
-        state = 2
-      end
-    else
-      enemy.dead = true
+    if test() then
+      
+      enemy.bulletController:createBullet(0, -12)
     end
   end
   return f
 end
---]]
 
-EnemyTypes.enemy_small_1 = { TAG = 'ENEMY',
-                             deck = enemy_small_deck,
-                             life = 25,
-                             hitbox = { min_x = -16,
-                                        min_y = -16,
-                                        max_x = 16,
-                                        max_y = 16
-                                      },
-                             bulletType = BulletTypes.enemy1,
-                           }
-EnemyTypes.enemy_small_1.behaviour = function (enemy)
-  local state = 0
-  local f = function ()
-    if not enemy or not enemy.body then
-      return
-    end
-    if state == 0 then
-      enemy.body:setLinearVelocity(200, -200)
-      state = 1
-    elseif state == 1 then
-      if not enemy:insideBoundaries() then
-        enemy.dead = true
-        state = 2
-      end
-    else
-      enemy.dead = true
-    end
-  end
-  return f
-end
-    
-    
-EnemyTypes.enemy_small_2 = { TAG = 'ENEMY',
-                             deck = enemy_small_deck,
-                             life = 50,
-                             hitbox = { min_x = -16,
-                                        min_y = -16,
-                                        max_x = 16,
-                                        max_y = 16
-                                      },
-                             bulletType = BulletTypes.enemy1,
-                           }
-EnemyTypes.enemy_small_2.behaviour = function (enemy)
-  local state = 0
-  local f = function ()
-    if not enemy or not enemy.body then
-      return
-    end
-    if state == 0 then
-      enemy.body:setLinearVelocity(-200, -200)
-      state = 1
-    elseif state == 1 then
-      if not enemy:insideBoundaries() then
-        enemy.dead = true
-        state = 2
-      end
-    else
-      enemy.dead = true
-    end
-  end
-  return f
-end
     
 
 return EnemyTypes

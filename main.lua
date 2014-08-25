@@ -11,6 +11,7 @@ end
 
 lume = require 'utils/lume'
 inspect = require 'utils/inspect'
+utils = require 'utils/utils'
 
 
 -- Stting up stuff
@@ -47,19 +48,13 @@ function resetLayers()
 end
 resetLayers()
 
-
 MOAIRenderMgr.setRenderTable( layers )
 
 physicsWorld = MOAIBox2DWorld.new()
 physicsWorld:setUnitsToMeters(0.1)
 physicsWorld:start()
 
---require 'resourcemgr'
-
---title = require 'scenes/title'
---t = title.new()
---t:setup()
-
+require 'utils/utils'
 SceneManager = require 'scenemgr'
 
 sceneManager = SceneManager.new()

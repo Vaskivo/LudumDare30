@@ -43,12 +43,7 @@ function Bullet.new(x, y, config, boundaries)
 end
 
 function Bullet.update(self, delta_time)
-  --local x, y = self.prop:getLoc()
   local x, y = self.body:getPosition()
-  local mov_x = (self.direction.x * delta_time)
-  local mov_y = (self.direction.y * delta_time)
-  local new_x = x + mov_x
-  local new_y = y + mov_y
   
   if self.boundaries then
     local bounds = self.boundaries
@@ -56,11 +51,7 @@ function Bullet.update(self, delta_time)
         not lume.inside(x, bounds.min_x, bounds.max_x) then
       self.dead = true
     end
-
   end
-  
-  --self.prop:setLoc(new_x, new_y)
-  --self.body:setTransform(new_x, new_y)
 end
 
 function Bullet.setDirection(self, x, y)

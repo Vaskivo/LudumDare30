@@ -2,6 +2,7 @@
 local Enemy = {}
 Enemy.__index = Enemy
 
+--[[
 local deck = MOAIScriptDeck.new()
 deck:setRect(-32, -32, 32, 32)
 deck:setDrawCallback(
@@ -10,9 +11,9 @@ deck:setDrawCallback(
     MOAIDraw.fillRect(-32, -32, 32, 32)
   end
 )
+--]]
 
-
-function Enemy.new(x, y, config, boundaries)
+function Enemy.new(x, y, config, b_index, boundaries)
   local enemy = setmetatable({}, Enemy)
   
   -- inits
@@ -34,7 +35,6 @@ function Enemy.new(x, y, config, boundaries)
                                                  layers[layer_EnemyBullets], 
                                                  BulletTypes.enemy1, 
                                                  boundaries)
-  bulletController:start()
 
   
   --[[
@@ -66,8 +66,7 @@ function Enemy.new(x, y, config, boundaries)
   enemy.dead = false
   enemy.hitsLastFrame = 0
   
-  
-  behaviour:run(config.behaviour(enemy))
+  behaviour:run(config.behaviour[b_index](enemy))
   return enemy
 end
 
@@ -81,16 +80,13 @@ function Enemy.update(self, delta_time)
   self.hitsLastFrame = 0
   
   if self.life <= 0 then
-    self:destroy()
+    --self:destroy()
     self.dead = true
   end  
 end
 
 function Enemy.destroy(self)
-  --self.bulletController:destroy()
-  --self.bulletController = nil
-  self.bulletController:stop()
-  
+    
   self.fixture.entity = nil
   self.fixture:destroy()
   self.fixture = nil

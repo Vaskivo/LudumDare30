@@ -13,10 +13,10 @@ EnemyTypes = require 'entities/enemytypes'
 local Level1 = {}
 Level1.__index = Level1
 
-local bounds = { min_x = -250,
-                 min_y = -410,
-                 max_x = 250,
-                 max_y = 410
+local bounds = { min_x = -220,
+                 min_y = -400,
+                 max_x = 220,
+                 max_y = 400
                 }
 
 function Level1.new()
@@ -27,7 +27,11 @@ end
 
 function Level1.update(self, delta_time)
   for enemy, _ in pairs(self.enemies) do
-    enemy:update(delta_time)
+    if enemy.dead then
+      self:destroyEnemy(enemy)
+    else
+      enemy:update(delta_time)
+    end
   end
   
   self.player:update(delta_time)
@@ -45,20 +49,88 @@ function Level1.setup(self)
   local player = PlayerShip.new(0, -300, bounds)
   layers[layer_Player]:insertProp(player.prop)
   
+  local behaviour = MOAICoroutine.new()
+  
   self.enemies = {}
-  
-  local enemy = Enemy.new(-200, 300, EnemyTypes.enemy_small, bounds)
-  layers[layer_Enemies]:insertProp(enemy.prop)
-  
-  self.enemies[enemy] = true
   self.player = player
+  self.behaviour = behaviour
+  
+  -- the enemies have controll of the bullets. But when one is destroyed,
+  -- we shouldn't destroy the bullets but we should clean them up later.
+  -- so, we use a bullet graveyard
+  -- After 5 seconds, it destroys a bullet controller and all its bullets
+  -- Gonna use a two layered graveyard
+  local graveyard = { {}, {} }
+  local graveyardThread = MOAICoroutine.new()
+  graveyardThread:run( function ()
+      while true do
+        for controller, _ in pairs(graveyard[2]) do
+          controller:destroy()
+        end
+        graveyard[2] = graveyard[1]
+        graveyard[1] = {}
+        
+        utils.threadSleep(5)
+      end
+    end
+  )
+  self.graveyard = graveyard
+  self.graveyardThread = graveyardThread
+  
+  
+  
+  behaviour:run(self:createBehaviour())
 end
 
 function Level1.cleanup(self)
+  -- enemies
+  -- controllers and bullets
+  -- player
+  
   
 end
 
+function Level1.createEnemy(self, x, y, config, b_index, bounds)
+  local enemy = Enemy.new(x, y, EnemyTypes.enemy_small, b_index, bounds)
+  layers[layer_Enemies]:insertProp(enemy.prop)
+  self.enemies[enemy] = true
+end
 
+function Level1.destroyEnemy(self, enemy)
+  if self.enemies[enemy] then
+    self.graveyard[1][enemy.bulletController] = true
+    layers[layer_Enemies]:removeProp(enemy.prop)
+    enemy:destroy()
+    self.enemies[enemy] = nil
+  end
+end
+
+function Level1.createBehaviour(self)
+  local f = function()
+
+    local timer = MOAITimer.new()
+    utils.threadSleep(2)
+
+    if not self.finished then
+      self:createEnemy(-180, 450, EnemyTypes.enemy_small, 1, bounds)
+      utils.threadSleep(2)
+    end
+
+    if not self.finished then
+      self:createEnemy(180, 450, EnemyTypes.enemy_small, 1, bounds)
+      utils.threadSleep(2)
+    end
+    
+    for i = 0, 10 do
+      if not self.finished then
+        self:createEnemy(-260, 420, EnemyTypes.enemy_small, 2, bounds)
+        utils.threadSleep(0.1)
+      end
+    end
+        
+  end
+  return f
+end
 
 function Level1.createPointerCallback(self)
   local playerLayer = layers[layer_Player]
@@ -86,7 +158,6 @@ function Level1.createMouseLeftCallback(self)
       self.player:resetDirection()
     end
   end
-  
   return callback
 end
 
